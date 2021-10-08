@@ -131,9 +131,9 @@ protocol.registerSchemesAsPrivileged([
 app.on("window-all-closed", () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+  // if (process.platform !== "darwin") {
+  //   app.quit();
+  // }
 });
 
 app.on("activate", () => {
@@ -158,12 +158,9 @@ app.on("ready", async () => {
 });
 app.whenReady().then(() => {
   const icon = nativeImage.createFromPath(
-    path.join(__dirname, "../public/logo2.png")
+    // @ts-ignore
+    path.join(__static, "favicon.ico")
   );
-  icon.resize({
-    width: 10,
-    height: 10
-  });
   tray = new Tray(icon);
   const contextMenu = Menu.buildFromTemplate([
     {

@@ -136,6 +136,7 @@ const formatTime = (time: number) => {
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
     transition: all 0.3s;
+    -webkit-app-region: no-drag;
 
     &:hover {
       .music-control-btn {
@@ -160,12 +161,14 @@ const formatTime = (time: number) => {
     }
     .music-cover--image {
       display: flex;
+      background-color: #eee;
 
       img {
         position: relative;
         width: 100%;
         height: 100%;
         object-fit: cover;
+        pointer-events: none;
         // filter: blur(1px);
       }
     }

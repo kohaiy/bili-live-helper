@@ -10,6 +10,8 @@ interface Config {
     msgsLimit?: number; // 消息列表上限，超出将截取掉旧消息
     autoClearEnter?: boolean; // 是否自动清除入场消息
     clearEnterBefore?: number; // 清除多少秒之前的入场消息
+    comboSameGift?: boolean; // 是否合并相同礼物
+    comboGiftIn?: number; // 合并多少秒内的礼物
     broadcast?: boolean; // 是否语音播报
   };
   music?: {

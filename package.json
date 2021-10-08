@@ -1,11 +1,16 @@
 {
   "name": "bili-live-tool",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "private": true,
+  "author": {
+    "name": "kohai",
+    "email": "i@kohai.top",
+    "url": "https://kohai.top"
+  },
+  "description": "A live tool for bilibili.",
   "scripts": {
     "start": "yarn electron:serve",
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "yarn electron:build",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",

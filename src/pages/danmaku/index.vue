@@ -15,7 +15,13 @@
 import { ref } from 'vue';
 import { remote } from 'electron';
 import DanmakuHeader from './components/danmaku-header.vue';
-import { onPopularTotal, onAll, onDanmuMsg, popularTotal, danmakuList } from './useDanmaku';
+import {
+  onPopularTotal,
+  onAll,
+  onDanmuMsg,
+  popularTotal,
+  danmakuList,
+} from './useDanmaku';
 import DanmakuListVue from './components/danmaku-list.vue';
 import BiliGiftStyleUtil from '@/utils/bili-gift-style.util';
 import { MSG_TYPE } from '@/utils/danmaku.util';
@@ -31,16 +37,52 @@ onPopularTotal((body) => {
 });
 
 onAll((body) => {
-  if ([
-    MSG_TYPE.ENTER_ROOM,
-    MSG_TYPE.SHARE_ROOM,
-    MSG_TYPE.FOLLOW_ROOM,
-    MSG_TYPE.DANMU_MSG,
-    MSG_TYPE.SEND_GIFT,
-    MSG_TYPE.COMBO_SEND,
-  ].includes(body.type)) {
+  if (
+    [
+      MSG_TYPE.ENTER_ROOM,
+      MSG_TYPE.SHARE_ROOM,
+      MSG_TYPE.FOLLOW_ROOM,
+      MSG_TYPE.DANMU_MSG,
+      MSG_TYPE.SEND_GIFT,
+      MSG_TYPE.COMBO_SEND,
+    ].includes(body.type)
+  ) {
+    if (config.value.basic?.comboSameGift && body.type === MSG_TYPE.SEND_GIFT) {
+      const comboGiftIn = config.value.basic.comboGiftIn || 10;
+      const timeLimit = Date.now() - comboGiftIn * 1000;
+      let index = danmakuList.value.length - 1;
+      for (; index >= 0; index--) {
+        const { time, uid, type, gift } = danmakuList.value[index];
+        if (time > timeLimit &&
+          type === body.type &&
+          uid === body.uid &&
+          gift?.giftId === body.gift?.giftId) {
+          break;
+        }
+      }
+      const gift = danmakuList.value[index];
+      // const index = danmakuList.value.findIndex(({ time }) => time > timeLimit);
+      // const list = danmakuList.value.slice(index).reverse();
+      // const gift = list.find(
+      //   ({ uid, type, gift }) =>
+      //     type === body.type &&
+      //     uid === body.uid &&
+      //     gift?.giftId === body.gift?.giftId
+      // );
+      if (gift) {
+        gift.gift!.num += body.gift?.num || 0;
+        gift.time = Date.now();
+        danmakuList.value.splice(index, 1);
+        danmakuList.value.push(gift);
+        return;
+      }
+    }
     danmakuList.value.push(body);
+
+
     clearDanmakuList();
+    // TODO watch 有点问题
+    danmakuList.value = [...danmakuList.value];
   } else {
     // console.log(body.type, body);
   }
@@ -55,7 +97,8 @@ const clearDanmakuList = () => {
     const clearEnterBefore = config.value.basic.clearEnterBefore || 10;
     const clearTime = Date.now() - clearEnterBefore * 1000;
     danmakuList.value = danmakuList.value.filter(
-      ({ time, type }) => type !== 'ENTER_ROOM' || time >= clearTime);
+      ({ time, type }) => type !== 'ENTER_ROOM' || time >= clearTime
+    );
   }
 };
 
@@ -63,17 +106,16 @@ onDanmuMsg((body) => {
   IpcRendererUtil.broadcast('DANMU_MSG', body);
 });
 
-
 const handleMouseEnter = () => {
   if (isLocked.value) {
     remote.getCurrentWindow().setIgnoreMouseEvents(true, { forward: true });
   }
-}
+};
 const handleMouseLeave = () => {
   if (isLocked.value) {
     remote.getCurrentWindow().setIgnoreMouseEvents(false);
   }
-}
+};
 </script>
 
 <style lang="scss">

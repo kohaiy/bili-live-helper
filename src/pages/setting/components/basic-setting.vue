@@ -25,6 +25,18 @@
             </el-col>
           </el-row>
         </el-form-item>
+        <el-form-item label="合并相同礼物">
+          <el-row>
+            <el-col :span="12">
+              <el-switch v-model="form.comboSameGift" />
+            </el-col>
+            <el-col :span="12" v-show="form.comboSameGift">
+              <el-input type="number" v-model="form.comboGiftIn">
+                <template #append>秒内</template>
+              </el-input>
+            </el-col>
+          </el-row>
+        </el-form-item>
         <el-form-item label="语音播报">
           <el-switch v-model="form.broadcast" />
         </el-form-item>
@@ -53,10 +65,11 @@ const rules = {
 const handleSave = async () => {
   form$.value?.validate(async (valid) => {
     if (valid) {
-      const { uid, msgsLimit, clearEnterBefore } = form.value;
+      const { uid, msgsLimit, clearEnterBefore, comboGiftIn } = form.value;
       form.value.uid = uid ? +uid : undefined;
       form.value.msgsLimit = msgsLimit ? +msgsLimit : undefined;
       form.value.clearEnterBefore = clearEnterBefore ? +clearEnterBefore : undefined;
+      form.value.comboGiftIn = comboGiftIn ? +comboGiftIn : undefined;
       config.value.basic = form.value;
       const res = await saveConfig();
       if (res) {

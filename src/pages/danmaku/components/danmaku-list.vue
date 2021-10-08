@@ -22,6 +22,7 @@ import DanmakuItem from './danmaku-item.vue';
 const list$ = ref<HTMLDivElement>();
 const isToBottom = ref(true);
 const unreadTotal = ref(0);
+let isAutoToBottom = false;
 
 onDanmuMsg(() => {
   if (!isToBottom.value) unreadTotal.value += 1;
@@ -44,13 +45,18 @@ const handleToBottom = () => {
   scrollToBottom();
 };
 
-watch(danmakuList.value, () => {
+watch(danmakuList, () => {
   if (isToBottom.value) {
+    isAutoToBottom = true;
     scrollToBottom();
+    setTimeout(() => {
+      isAutoToBottom = false;
+    }, 200);
   }
 });
 
 const handleListScroll = () => {
+  if (isAutoToBottom) return;
   if (!list$.value) return;
   const { scrollHeight, scrollTop, clientHeight } = list$.value;
   isToBottom.value = scrollHeight - scrollTop - clientHeight <= 10;

@@ -32,7 +32,7 @@ const danmakuType = computed(() => {
 });
 
 const handleRightClick = () => {
-  console.log(props.data.msg);
+  console.log(props.data);
 };
 
 const mapTime = (time: number) => new Date(time).toLocaleTimeString();

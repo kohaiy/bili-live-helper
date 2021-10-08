@@ -33,7 +33,7 @@ defineProps<{
   data: MsgBody;
 }>();
 
-const mapColor = (color: number) => `#${color.toString(16)}`
+const mapColor = (color: number) => `#${`00${color.toString(16)}`.slice(-6)}`
 
 </script>
 
