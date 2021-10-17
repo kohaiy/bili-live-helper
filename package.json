@@ -1,13 +1,13 @@
 {
-  "name": "bili-live-tool",
-  "version": "2.0.0",
+  "name": "bili-live-helper",
+  "version": "0.1.0",
   "private": true,
   "author": {
     "name": "kohai",
     "email": "i@kohai.top",
     "url": "https://kohai.top"
   },
-  "description": "A live tool for bilibili.",
+  "description": "A helper for bilibili's live.",
   "scripts": {
     "start": "yarn electron:serve",
     "build": "yarn electron:build",

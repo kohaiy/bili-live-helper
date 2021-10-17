@@ -157,9 +157,10 @@ app.on("ready", async () => {
   windowGenerator.danmaku();
 });
 app.whenReady().then(() => {
+  const iconName = process.platform === 'win32' ? 'favicon.ico' : 'favicon.png';
   const icon = nativeImage.createFromPath(
     // @ts-ignore
-    path.join(__static, "favicon.ico")
+    path.join(__static, iconName)
   );
   tray = new Tray(icon);
   const contextMenu = Menu.buildFromTemplate([
