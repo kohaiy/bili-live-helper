@@ -1,7 +1,7 @@
 import os from "os";
 import path from "path";
 import fs from "fs";
-import DataUtil from "../data.util";
+import DataUtil from "../../utils/data.util";
 
 interface Config {
   test?: string;

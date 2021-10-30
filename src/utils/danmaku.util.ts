@@ -43,6 +43,7 @@ export class MsgBody {
   type: MSG_TYPE_KEY = "OTHER";
   uid = -1;
   uname = "";
+  isAdmin = false;
   msg = "";
   // 粉丝牌子
   fansMedal?: {
@@ -50,6 +51,7 @@ export class MsgBody {
     name: string;
     uid: number;
     uname: string;
+    roomId: number;
     color: number;
     borderColor: number;
     bgStartColor: number;
@@ -102,12 +104,12 @@ export class MsgBody {
       info: [
         ,
         msg,
-        [uid, uname],
+        [uid, uname, isAdmin],
         [
           fmLevel,
           fmName,
           fmUpName,
-          fmUpUid,
+          fmRoomId,
           color,
           ,
           ,
@@ -115,14 +117,15 @@ export class MsgBody {
           bgStartColor,
           bgEndColor,
           ,
-          isActive
+          isActive,
+          fmUpUid,
         ]
       ]
     } = body as {
       info: [
         unknown,
         string,
-        [number, string],
+        [number, string, number],
         [
           number,
           string,
@@ -135,7 +138,8 @@ export class MsgBody {
           number,
           number,
           number,
-          number
+          number,
+          number,
         ]
       ];
     };
@@ -152,8 +156,12 @@ export class MsgBody {
         bgStartColor,
         bgEndColor,
         uid: fmUpUid,
-        uname: fmUpName
+        uname: fmUpName,
+        roomId: fmRoomId
       };
+    }
+    if (isAdmin) {
+      instance.isAdmin = true;
     }
     instance.type = "DANMU_MSG";
     return instance;

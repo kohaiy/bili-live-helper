@@ -1,6 +1,6 @@
 import { ref, watch } from "vue";
 import Danmaku, { MsgBody, MsgCallback } from "@/utils/danmaku.util";
-import { config } from "@/utils/config";
+import { config, saveConfig } from "@/utils/config";
 import BiliApi from "@/apis/bili.api";
 
 export const popularTotal = ref(0);
@@ -18,6 +18,22 @@ watch(
         const { roomId, uname } = res;
         config.value.roomId = roomId;
         config.value.uname = uname;
+        const uidList = config.value.history?.uidList ?? [];
+        let uid = uidList.find(({ id }) => id === newVal);
+        if (uid) {
+          uid.name = uname;
+        } else {
+          uid = {
+            id: newVal,
+            name: uname,
+          };
+          uidList.push(uid);
+        }
+        config.value.history = config.value.history ?? {};
+        config.value.history.uidList = uidList;
+        saveConfig();
+
+        danmakuList.value = [];
         danmaku.connect(roomId);
       }
     }

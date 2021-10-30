@@ -12,6 +12,9 @@
           </el-icon>
         </div>
       </div>
+      <div class="music-control">
+        <div class="music-next">下一首</div>
+      </div>
       <div v-if="currentSong">{{ currentSong.name }}</div>
       <div class="music-progress">
         <div class="music-progress--text">{{ formatTime(playInfo.duration) }}</div>
@@ -182,6 +185,10 @@ const formatTime = (time: number) => {
       transition: all 0.2s;
       cursor: pointer;
     }
+  }
+
+  .music-control {
+    padding-left: 120px;
   }
 
   .music-progress {

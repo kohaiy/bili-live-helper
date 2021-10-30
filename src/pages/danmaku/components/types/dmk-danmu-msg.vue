@@ -20,7 +20,7 @@
         }"
       >{{ data.fansMedal.level }}</div>
     </div>
-    <div class="msg-nickname">{{ data.uname }}:</div>
+    <div class="msg-nickname" :class="{ admin: data.isAdmin }">{{ data.uname }}:</div>
     <div class="msg-text">{{ data.msg }}</div>
   </div>
 </template>
@@ -85,6 +85,16 @@ const mapColor = (color: number) => `#${`00${color.toString(16)}`.slice(-6)}`
     margin-right: 4px;
     font-size: 12px;
     color: #39b0f1;
+
+    &.admin::before {
+      content: '房';
+      margin-right: 4px;
+      padding: 0 2px;
+      border-radius: 2px;
+      border: 1px solid #fea249;
+      font-size: 12px;
+      color: #fea249;
+    }
   }
 
   .msg-text {

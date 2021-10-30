@@ -8,7 +8,11 @@
             v-model="form.uid"
             :fetch-suggestions="handleUidQuery"
             @select="handleUidSelect"
-          />
+          >
+            <template #default="{ item }">
+              <div>{{ item.label }}({{ item.value }})</div>
+            </template>
+          </el-autocomplete>
         </el-form-item>
         <el-form-item label="弹幕列表上限">
           <el-input type="number" v-model="form.msgsLimit" />
@@ -79,10 +83,10 @@ const handleSave = async () => {
   });
 };
 
-const uids = [24731556];
+const uids = config.value.history?.uidList ?? [];
 
 const handleUidQuery = (qs: number, cb: (r: { value: number }[]) => void) => {
-  cb(uids.filter(uid => uid.toString().startsWith(qs.toString())).map(uid => ({ value: uid })))
+  cb(uids.filter(({ id }) => id.toString().startsWith(qs.toString())).map(({ id, name }) => ({ value: id, label: name })))
 };
 
 const handleUidSelect = ({ value }: { value: number }) => {

@@ -2,6 +2,8 @@ module.exports = {
   lintOnSave: false,
   pluginOptions: {
     electronBuilder: {
+      mainProcessFile: './src/background/index.ts',
+      mainProcessWatch: ['./src/background/**/**'],
       nodeIntegration: true,
       builderOptions: {
         appId: 'top.kohai.bili-live-helper',

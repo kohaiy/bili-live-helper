@@ -21,6 +21,10 @@ interface Config {
     listLimit?: number; // 歌单上限
     blackList?: { id: number; name: string }[]; // 黑名单歌曲列表
   };
+  // 历史记录
+  history?: {
+    uidList?: { id: number; name?: string }[];
+  },
 }
 
 export const config = ref<Config>({});

@@ -1,5 +1,5 @@
 import { ipcMain, BrowserWindow } from "electron";
-import DataUtil from "../data.util";
+import DataUtil from "../../utils/data.util";
 
 type CALLBACK = (payload: any) => Promise<any> | any;
 
