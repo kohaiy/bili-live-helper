@@ -7,8 +7,8 @@
         </div>
         <div class="music-control-btn" @click="togglePlayStatus">
           <el-icon :size="40">
-            <video-play v-if="isPlaying" />
-            <video-pause v-else />
+            <icon-play-circle-fill v-if="isPlaying"/>
+            <icon-pause-circle-fill v-else />
           </el-icon>
         </div>
       </div>
@@ -30,8 +30,7 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import { VideoPlay, VideoPause } from '@element-plus/icons';
-import { ElMessage } from 'element-plus';
+import { Message } from '@arco-design/web-vue';
 import { MsgBody } from '@/utils/danmaku.util';
 import IpcRendererUtil from '@/utils/ipc-renderer.util';
 import { isPlaying, handleAddSong, currentSong } from './useMusic';
@@ -82,9 +81,8 @@ const handlePlayNewSong = async (song: Song) => {
     playInfo.value.duration = audio.duration;
   } catch (e) {
     console.error(e);
-    ElMessage({
-      type: 'error',
-      message: '哦欧，播放失败了，可能是没版权吧～',
+    Message.error({
+      content: '哦欧，播放失败了，可能是没版权吧～',
       duration: 1500,
     });
     // 播放失败后，播放下一首

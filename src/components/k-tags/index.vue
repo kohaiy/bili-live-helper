@@ -1,13 +1,13 @@
 <template>
   <div class="k-tags">
-    <el-input v-model="inputValue" @keyup.enter="handleInputConfirm" placeholder="按 ENTER 添加"></el-input>
-    <el-tag
+    <a-input v-model="inputValue" @keyup.enter="handleInputConfirm" placeholder="按 ENTER 添加"></a-input>
+    <a-tag
       :key="tag"
       v-for="tag in modelValue"
       closable
       :disable-transitions="false"
       @close="handleRemove(tag)"
-    >{{ tag[labelKey] }}</el-tag>
+    >{{ tag[labelKey] }}</a-tag>
   </div>
 </template>
 

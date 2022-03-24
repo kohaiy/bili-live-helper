@@ -1,30 +1,30 @@
 <template>
   <setting-container title="点歌设置" @confirm="handleSave">
     <div class="music-setting">
-      <el-form :model="form" :rules="rules" ref="form$" label-position="top" label-suffix=" :">
-        <el-form-item label="开启点歌">
-          <el-switch v-model="form.enable" />
-        </el-form-item>
-        <el-form-item label="默认歌单" v-show="form.enable">
-          <el-input v-model="form.defaultListId" />
-        </el-form-item>
-        <el-form-item label="切歌上限" v-show="form.enable">
-          <el-input-number v-model="form.cutLimit" :min="1" />
-        </el-form-item>
-        <el-form-item label="歌单上限" v-show="form.enable">
-          <el-input-number v-model="form.listLimit" :min="0" />
-        </el-form-item>
-        <el-form-item label="歌曲黑名单" v-show="form.enable">
+      <a-form :model="form" :rules="rules" ref="form$" label-position="top" label-suffix=" :">
+        <a-form-item label="开启点歌">
+          <a-switch v-model="form.enable" />
+        </a-form-item>
+        <a-form-item label="默认歌单" v-show="form.enable">
+          <a-input v-model="form.defaultListId" />
+        </a-form-item>
+        <a-form-item label="切歌上限" v-show="form.enable">
+          <a-input-number v-model="form.cutLimit" :min="1" />
+        </a-form-item>
+        <a-form-item label="歌单上限" v-show="form.enable">
+          <a-input-number v-model="form.listLimit" :min="0" />
+        </a-form-item>
+        <a-form-item label="歌曲黑名单" v-show="form.enable">
           <k-tags :model-value="form.blackList" @add="handleBlackAdd" />
-        </el-form-item>
-      </el-form>
+        </a-form-item>
+      </a-form>
     </div>
   </setting-container>
 </template>
 
 <script lang="ts" setup>
 import { config, saveConfig } from '@/utils/config';
-import { ElForm, ElMessage } from 'element-plus';
+import { Form as AForm, Message } from '@arco-design/web-vue';
 import { ref } from 'vue';
 import SettingContainer from './setting-container.vue';
 import KTags from '@/components/k-tags/index.vue';
@@ -34,7 +34,7 @@ const form = ref({
   ...config.value.music,
   blackList: config.value.music?.blackList || [],
 });
-const form$ = ref<InstanceType<typeof ElForm>>();
+const form$ = ref<InstanceType<typeof AForm>>();
 
 const rules = {
 };
@@ -46,7 +46,7 @@ const handleSave = async () => {
       config.value.music = form.value;
       const res = await saveConfig();
       if (res) {
-        ElMessage.success('保存成功');
+        Message.success('保存成功');
       }
     }
   });
