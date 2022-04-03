@@ -1,75 +1,158 @@
 <template>
-  <div class="music">
+  <div class="music" @dblclick="handleCloseWin">
     <div class="music__inner">
+      <!-- 歌曲封面 -->
       <div class="music-cover" :class="{ 'is-playing': isPlaying }">
         <div class="music-cover--image">
-          <img :src="currentSong?.al.picUrl" alt="cover" />
+          <img
+            :src="currentSong?.al.picUrl"
+            v-if="currentSong?.al.picUrl"
+            alt="cover"
+          />
+          <div class="not-image" v-else><icon-music /></div>
         </div>
-        <div class="music-control-btn" @click="togglePlayStatus">
-          <el-icon :size="40">
-            <icon-play-circle-fill v-if="isPlaying"/>
-            <icon-pause-circle-fill v-else />
-          </el-icon>
+        <div
+          class="music-control-btn"
+          @click="togglePlayStatus"
+          v-if="currentSong"
+        >
+          <icon-play-arrow v-if="isPlaying" />
+          <icon-pause v-else />
         </div>
       </div>
-      <div class="music-control">
-        <div class="music-next">下一首</div>
+      <!-- 歌曲信息 -->
+      <div class="music-info">
+        <div class="music-heading">
+          <div class="music-next" @click="handleNextSong">
+            <icon-skip-next-fill />
+          </div>
+          <div class="music-name" :title="currentSong?.name">
+            {{ currentSong?.name ?? "暂无歌曲" }}
+          </div>
+        </div>
+        <div class="music-artist">
+          <KWalkingText>{{
+            currentSong?.artists.map(({ name }) => name).join() ?? "暂无歌手"
+          }}</KWalkingText>
+        </div>
+        <div class="music-volume">
+          <div class="music-volume__inner">
+            <icon-sound-fill />
+            <KSlider
+              :model-value="volume"
+              @update:model-value="handleVolumeChange"
+              :max="1"
+            />
+            <div class="volume-text">{{ (volume * 100).toFixed(0) }}%</div>
+          </div>
+          <MusicDynamic />
+        </div>
       </div>
-      <div v-if="currentSong">{{ currentSong.name }}</div>
+      <!-- 歌词 -->
+      <div class="music-lyric">
+        <MusicLyric
+          :lyric="currentLyric"
+          :current-time="playInfo.currentTime"
+        />
+      </div>
+      <!-- 进度条 -->
       <div class="music-progress">
-        <div class="music-progress--text">{{ formatTime(playInfo.duration) }}</div>
-        <div class="music-progress--bar">
-          <div class="music-progress--bar__value" :style="{ width: `${playInfo.currentTime / playInfo.duration * 100}%` }"></div>
-          <!-- <el-slider v-model="progress" :show-tooltip="false"></el-slider> -->
+        <div class="music-progress--text">
+          {{ formatTime(playInfo.duration) }}
         </div>
-        <div class="music-progress--text">{{ formatTime(playInfo.currentTime) }}</div>
+        <div class="music-progress--bar">
+          <KSlider
+            :model-value="playInfo.currentTime"
+            @update:model-value="handleUpdateCurrentTime"
+            :max="playInfo.duration"
+          />
+        </div>
+        <div class="music-progress--text">
+          {{ formatTime(playInfo.currentTime) }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
-import { Message } from '@arco-design/web-vue';
-import { MsgBody } from '@/utils/danmaku.util';
-import IpcRendererUtil from '@/utils/ipc-renderer.util';
-import { isPlaying, handleAddSong, currentSong } from './useMusic';
-import { Song } from '@/apis/netease.api';
+import { remote } from "electron";
+import { ref, watch } from "vue";
+import { Message } from "@arco-design/web-vue";
+import { MsgBody } from "@/utils/danmaku.util";
+import IpcRendererUtil from "@/utils/ipc-renderer.util";
+import {
+  isPlaying,
+  handleAddSong,
+  handleNextSong,
+  currentSong,
+  currentLyric,
+  songList,
+} from "./useMusic";
+import { Song } from "@/apis/netease.api";
+import KSlider from "@/components/k-slider/index.vue";
+import MusicLyric from "./components/music-lyric.vue";
+import MusicDynamic from "./components/music-dynamic.vue";
+import KWalkingText from "@/components/k-walking-text/index.vue";
 
 const playInfo = ref({
   duration: 0,
-  currentTime: 0
+  currentTime: 0,
 });
+const volume = ref(Number(localStorage.getItem("volume") || 0.5));
 const audio = new Audio();
-audio.volume = 0.1;
-audio.addEventListener('play', () => {
-  console.log('play');
+audio.volume = volume.value;
+audio.addEventListener("play", () => {
+  console.log(currentSong.value);
+  isPlaying.value = true;
 });
-audio.addEventListener('playing', () => {
-  console.log('playing');
+audio.addEventListener("volumechange", () => {
+  volume.value = audio.volume;
 });
-audio.addEventListener('timeupdate', () => {
+audio.addEventListener("playing", () => {
+  console.log("playing");
+});
+audio.addEventListener("pause", () => {
+  isPlaying.value = false;
+});
+audio.addEventListener("timeupdate", () => {
   playInfo.value.currentTime = audio.currentTime;
 });
+audio.addEventListener("ended", () => {
+  playInfo.value.currentTime = 0;
+  playInfo.value.duration = 0;
+  handleNextSong();
+});
 
-IpcRendererUtil.on('DANMU_MSG', (body: MsgBody) => {
-  if (body.type === 'DANMU_MSG') {
+IpcRendererUtil.on("DANMU_MSG", async (body: MsgBody) => {
+  if (body.type === "DANMU_MSG") {
     if (/^点歌/.test(body.msg)) {
       console.log(body.msg);
-      handleAddSong(body.msg.replace(/^点歌/, ''));
+      await handleAddSong(body.msg.replace(/^点歌/, ""));
+      console.log(songList.value);
     }
   }
 });
 
-// const progress = ref(0);
-watch(() => currentSong.value, () => {
-  console.log('currentSong change');
-  if (currentSong.value) {
-    handlePlayNewSong(currentSong.value)
+watch(
+  () => currentSong.value,
+  () => {
+    console.log("currentSong change");
+    if (currentSong.value) {
+      handlePlayNewSong(currentSong.value);
+    } else {
+      audio.pause();
+    }
   }
-});
+);
 
-handleAddSong('好日子');
+handleAddSong("好日子");
+handleAddSong("1870360991");
+handleAddSong("1870360991");
+handleAddSong("1870360991");
+handleAddSong("1870360991");
+handleAddSong("1870360991");
+handleAddSong("1870360991");
 
 const handlePlayNewSong = async (song: Song) => {
   try {
@@ -82,7 +165,7 @@ const handlePlayNewSong = async (song: Song) => {
   } catch (e) {
     console.error(e);
     Message.error({
-      content: '哦欧，播放失败了，可能是没版权吧～',
+      content: "哦欧，播放失败了，可能是没版权吧～",
       duration: 1500,
     });
     // 播放失败后，播放下一首
@@ -90,8 +173,7 @@ const handlePlayNewSong = async (song: Song) => {
     //   this.play();
     // });
   }
-
-}
+};
 
 const togglePlayStatus = () => {
   isPlaying.value = !isPlaying.value;
@@ -102,17 +184,28 @@ const togglePlayStatus = () => {
   }
 };
 
+const handleUpdateCurrentTime = (value: number) => {
+  audio.currentTime = value;
+};
+const handleVolumeChange = (value: number) => {
+  audio.volume = value;
+  localStorage.setItem("volume", value.toString());
+};
+
 const formatTime = (time: number) => {
   time = Math.round(time);
   const secs = time % 60;
   const mins = (time - secs) / 60;
 
-  return [mins, secs].map(it => `0${it}`.slice(-2)).join(':');
-}
+  return [mins, secs].map((it) => `0${it}`.slice(-2)).join(":");
+};
 
+const handleCloseWin = () => {
+  remote.getCurrentWindow().close();
+};
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .music {
   width: 100%;
   height: 100vh;
@@ -121,6 +214,7 @@ const formatTime = (time: number) => {
   .music__inner {
     width: 100%;
     height: 100%;
+    padding: 8px 0 16px;
     border-radius: 12px;
     background-color: #fff;
     overflow: hidden;
@@ -141,6 +235,7 @@ const formatTime = (time: number) => {
 
     &:hover {
       .music-control-btn {
+        font-size: 48px;
         opacity: 1 !important;
       }
     }
@@ -172,6 +267,19 @@ const formatTime = (time: number) => {
         pointer-events: none;
         // filter: blur(1px);
       }
+      .not-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 32px;
+        color: #666;
+        background-color: #eee;
+      }
     }
     .music-control-btn {
       position: absolute;
@@ -179,6 +287,7 @@ const formatTime = (time: number) => {
       top: 50%;
       display: flex;
       transform: translate(-50%, -50%);
+      font-size: 42px;
       color: #fff;
       transition: all 0.2s;
       cursor: pointer;
@@ -186,7 +295,106 @@ const formatTime = (time: number) => {
   }
 
   .music-control {
+    display: none;
     padding-left: 120px;
+    .music-next {
+      font-size: 24px;
+    }
+  }
+  .music-info {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-left: 128px;
+    .music-heading {
+      display: flex;
+      align-items: center;
+      .music-name {
+        flex: 1;
+        font-size: 18px;
+        font-weight: bold;
+        word-break: keep-all;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .music-next {
+        position: relative;
+        top: 2px;
+        left: -4px;
+        width: 0;
+        font-size: 32px;
+        opacity: 0;
+        color: rgb(3, 106, 223);
+        transition: all 0.3s;
+        cursor: pointer;
+      }
+      &:hover {
+        .music-next {
+          width: 28px;
+          opacity: 1;
+        }
+      }
+    }
+
+    .music-artist {
+      word-break: keep-all;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-size: 12px;
+      color: #999;
+    }
+    .music-volume {
+      height: 24px;
+      margin-top: 4px;
+      margin-left: -24px;
+      &:hover {
+        .music-dynamic {
+          display: none;
+        }
+        .music-volume__inner {
+          display: flex;
+          opacity: 1;
+        }
+      }
+      .music-volume__inner {
+        display: none;
+        align-items: center;
+        height: 24px;
+        padding-right: 8px;
+        opacity: 0;
+        transition: all 0.3s;
+        .arco-icon {
+          margin-right: 4px;
+          font-size: 20px;
+        }
+        .k-slider {
+          .k-slider-track {
+            --track-height: 4px;
+            --btn-width: 8px;
+            --btn-height: 8px;
+          }
+        }
+        .volume-text {
+          min-width: 36px;
+          text-align: right;
+          font-size: 12px;
+          color: #999;
+        }
+      }
+    }
+  }
+
+  .music-dynamic {
+    margin-top: 4px;
+    margin-left: -24px;
+  }
+
+  .music-lyric {
+    margin-top: 4px;
+    font-size: 14px;
+    color: #666;
   }
 
   .music-progress {
@@ -198,15 +406,14 @@ const formatTime = (time: number) => {
 
     .music-progress--bar {
       width: 100%;
-      height: 4px;
+      /* height: 4px; */
       border-radius: 2px;
-      overflow: hidden;
-      background-color: rgb(0, 0, 0, .2);
+      /* background-color: rgb(0, 0, 0, 0.2); */
 
       .music-progress--bar__value {
         height: 100%;
         background-color: rgb(8, 136, 235);
-        transition: all .2s;
+        transition: all 0.2s;
       }
     }
     .music-progress--text {
