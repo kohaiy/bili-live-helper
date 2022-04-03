@@ -9,7 +9,7 @@
           unreadTotal > 99 ? '∞' : unreadTotal
         }}
       </span>
-      <i v-else class="el-icon-message-solid"></i>
+      <icon-notification v-else/>
     </div>
   </div>
 </template>

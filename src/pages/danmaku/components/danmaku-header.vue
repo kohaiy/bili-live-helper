@@ -3,7 +3,7 @@
     <!-- 右侧操作按钮 -->
     <div class="operates">
       <div class="btn" v-if="danmakuList.length" title="清屏" @click="handleClearDanmuku">
-        <i class="el-icon-toilet-paper"></i>
+        <icon-loop />
       </div>
       <div
         class="btn on-top"
@@ -11,13 +11,14 @@
         title="置顶"
         @click="handleOnTopChange"
       >
-        <i class="el-icon-aim"></i>
+        <icon-pushpin />
       </div>
       <div class="btn lock" :class="{ 'is-active': isLocked }" title="锁定" @click="handleLockChange">
-        <i :class="`el-icon-${isLocked ? 'lock' : 'unlock'}`"></i>
+        <icon-lock v-if="isLocked"/>
+        <icon-unlock v-else/>
       </div>
       <div class="btn close" title="关闭" @click="handleClose">
-        <i class="el-icon-circle-close"></i>
+        <icon-close-circle />
       </div>
     </div>
     <!-- up 信息统计 -->

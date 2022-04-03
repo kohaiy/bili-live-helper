@@ -1,15 +1,13 @@
 <template>
-  <el-scrollbar>
-    <div class="setting-container">
-      <div class="setting-header" v-if="title">
-        <h2 class="setting-title">{{ title }}</h2>
-      </div>
-      <slot />
-      <div class="setting-footer">
-        <el-button type="primary" @click="$emit('confirm')">保存</el-button>
-      </div>
+  <div class="setting-container">
+    <div class="setting-header" v-if="title">
+      <h2 class="setting-title">{{ title }}</h2>
     </div>
-  </el-scrollbar>
+    <slot />
+    <div class="setting-footer">
+      <a-button type="primary" @click="$emit('confirm')">保存</a-button>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>

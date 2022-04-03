@@ -134,5 +134,20 @@ const handleMouseLeave = () => {
     flex: 1;
     overflow: auto;
   }
+
+  * {
+    &::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 5px;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+  }
 }
 </style>

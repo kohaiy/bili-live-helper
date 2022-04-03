@@ -1,31 +1,31 @@
 <template>
   <div class="setting">
-    <el-tabs tab-position="left">
-      <el-tab-pane>
-        <template #label>
+    <a-tabs position="left" type="capsule">
+      <a-tab-pane key="1">
+        <template #title>
           <span>
-            <i class="el-icon-setting"></i> 基础
+            <icon-settings /> 基础
           </span>
         </template>
         <basic-setting />
-      </el-tab-pane>
-      <el-tab-pane>
-        <template #label>
+      </a-tab-pane>
+      <a-tab-pane key="2">
+        <template #title>
           <span>
-            <i class="el-icon-headset"></i> 点歌
+            <icon-music /> 点歌
           </span>
         </template>
         <music-setting />
-      </el-tab-pane>
-      <el-tab-pane>
-        <template #label>
+      </a-tab-pane>
+      <a-tab-pane key="3">
+        <template #title>
           <span>
-            <i class="el-icon-s-operation"></i> 其他
+            <icon-apps /> 其他
           </span>
         </template>
         <other-setting />
-      </el-tab-pane>
-    </el-tabs>
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 
@@ -33,6 +33,7 @@
 import BasicSetting from "./components/basic-setting.vue";
 import MusicSetting from "./components/music-setting.vue";
 import OtherSetting from "./components/other-setting.vue";
+
 </script>
 
 <style lang="scss" scoped>
@@ -44,13 +45,20 @@ import OtherSetting from "./components/other-setting.vue";
 
 <style lang="scss">
 .setting {
-  .el-tabs {
+  .arco-tabs {
     width: 100%;
     height: 100%;
-    .el-tabs__content {
+    .arco-tabs-content-list {
       height: 100%;
-      .el-tab-pane {
+      .arco-tabs-pane {
         height: 100%;
+        overflow: auto;
+      }
+    }
+    .arco-tabs-nav-type-capsule .arco-tabs-nav-tab {
+      justify-content: flex-start;
+      .arco-tabs-nav-tab-list {
+        min-height: 100%;
       }
     }
   }

@@ -74,7 +74,7 @@ export const windowGenerator: Record<WINDOWS_TYPE, () => void> = {
       height: 180,
       transparent: true,
       frame: false,
-      hasShadow: false,
+      // hasShadow: false,
       alwaysOnTop: true,
       autoHideMenuBar: true,
       webPreferences: {
