@@ -1,32 +1,29 @@
 <template>
   <div class="dmk-danmu-msg">
-    <div
-      class="msg-medal"
-      v-if="data.fansMedal?.level"
-      :style="{
-        borderColor: mapColor(data.fansMedal.borderColor),
-      }"
-    >
-      <div
-        class="fans-medal-label"
-        :style="{
-          backgroundImage: `linear-gradient(45deg, ${mapColor(data.fansMedal.bgStartColor)}, ${mapColor(data.fansMedal.bgEndColor)})`
-        }"
-      >{{ data.fansMedal.name }}</div>
-      <div
-        class="fans-medal-level"
-        :style="{
-          color: mapColor(data.fansMedal.color)
-        }"
-      >{{ data.fansMedal.level }}</div>
+    <div class="msg-medal" v-if="data.fansMedal?.level" :style="{
+      borderColor: mapColor(data.fansMedal.borderColor),
+    }">
+      <div class="fans-medal-label" :style="{
+        backgroundImage: `linear-gradient(45deg, ${mapColor(data.fansMedal.bgStartColor)}, ${mapColor(data.fansMedal.bgEndColor)})`
+      }">{{ data.fansMedal.name }}</div>
+      <div class="fans-medal-level" :style="{
+        color: mapColor(data.fansMedal.color)
+      }">{{ data.fansMedal.level }}</div>
     </div>
     <div class="msg-nickname" :class="{ admin: data.isAdmin }">{{ data.uname }}:</div>
-    <div class="msg-text">{{ data.msg }}</div>
+    <div class="msg-emoticon" v-if="data.emoticon">
+      <img :src="data.emoticon.url" alt="">
+    </div>
+    <div class="msg-text" v-else-if="data.emotes">
+      <DanmakuRichMsg :msg="data.msg" :emotes="data.emotes" />
+    </div>
+    <div class="msg-text" v-else>{{ data.msg }}</div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { MsgBody } from '@/utils/danmaku.util';
+import DanmakuRichMsg from '../danmaku-rich-msg.vue';
 
 defineProps<{
   data: MsgBody;
@@ -100,6 +97,15 @@ const mapColor = (color: number) => `#${`00${color.toString(16)}`.slice(-6)}`
     display: inline;
     font-size: 12px;
     color: #cccccc;
+  }
+
+  .msg-emoticon {
+    display: inline-flex;
+
+    img {
+      max-width: 60px;
+      max-height: 40px;
+    }
   }
 
 }

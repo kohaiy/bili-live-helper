@@ -64,6 +64,17 @@ export class MsgBody {
     giftType: number;
     action: string;
   };
+  // 表情包图片
+  emoticon?: {
+    width: number;
+    height: number;
+    url: string;
+  };
+  emotes?: Record<string, {
+    width: number;
+    height: number;
+    url: string;
+  }>
   count = 0;
   raw: unknown;
 
@@ -102,7 +113,10 @@ export class MsgBody {
   static parseDanmuMsg(body: unknown) {
     const {
       info: [
-        ,
+        [, , , , , , , , , , , , ,
+          rawEmoticon,
+          ,
+          rawEmotes],
         msg,
         [uid, uname, isAdmin],
         [
@@ -123,7 +137,19 @@ export class MsgBody {
       ]
     } = body as {
       info: [
-        unknown,
+        [unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+          // 13
+          {
+            width: number;
+            height: number;
+            url: string;
+          },
+          unknown,
+          // 15
+          {
+            extra: string;
+          },
+        ],
         string,
         [number, string, number],
         [
@@ -147,6 +173,23 @@ export class MsgBody {
     instance.uid = uid;
     instance.uname = uname;
     instance.msg = msg;
+    if (rawEmoticon?.url) {
+      instance.emoticon = {
+        width: rawEmoticon.width,
+        height: rawEmoticon.height,
+        url: rawEmoticon.url,
+      };
+    }
+    if (rawEmotes?.extra) {
+      try {
+        const rawEmotesObj = JSON.parse(rawEmotes.extra);
+        if (rawEmotesObj.emots) {
+          instance.emotes = rawEmotesObj.emots;
+        }
+       } catch (e) {
+        console.error(e);
+      }
+    }
     if (fmLevel && isActive) {
       instance.fansMedal = {
         level: fmLevel,
