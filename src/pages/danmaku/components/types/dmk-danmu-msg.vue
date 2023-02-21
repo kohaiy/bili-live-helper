@@ -100,6 +100,9 @@ const mapColor = (color: number) => `#${`00${color.toString(16)}`.slice(-6)}`
   }
 
   .msg-emoticon {
+    position: relative;
+    top: 4px;
+    margin-top: -4px;
     display: inline-flex;
 
     img {

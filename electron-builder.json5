@@ -2,6 +2,7 @@
  * @see https://www.electron.build/configuration/configuration
  */
 {
+  "productName": "哔哩直播小助手",
   "appId": "YourAppID",
   "asar": true,
   "icon": "public/icon.png",

@@ -25,7 +25,10 @@ export const showDanmakuWin = () => {
             // Open devTool if the app is not packaged
             // danmakuWin.webContents.openDevTools()
         } else {
-            danmakuWin.loadFile(indexHtml + '#/danmaku')
+            danmakuWin.loadFile(indexHtml, {
+                hash: '/danmaku'
+            })
+
         }
     }
     danmakuWin.addListener("close", () => {
@@ -43,7 +46,7 @@ export const showSettingWin = () => {
         if (process.env.VITE_DEV_SERVER_URL) {
             settingWin.loadURL(url + '#/setting')
         } else {
-            settingWin.loadFile(indexHtml + '#/setting')
+            settingWin.loadFile(indexHtml, { hash: '/setting' })
         }
     }
     settingWin.addListener("close", () => {
@@ -61,7 +64,7 @@ export const showMusicWin = () => {
         if (process.env.VITE_DEV_SERVER_URL) {
             musicWin.loadURL(url + '#/music')
         } else {
-            musicWin.loadFile(indexHtml + '#/music')
+            musicWin.loadFile(indexHtml, { hash: '/music' })
         }
     }
     musicWin.addListener("close", () => {

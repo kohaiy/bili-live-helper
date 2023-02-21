@@ -28,6 +28,7 @@ const richText = computed(() => {
 <style lang="scss" scoped>
 .danmaku-rich-msg {
     img {
+        display: inline;
         max-width: 24px;
         max-height: 24px;
         vertical-align: bottom;

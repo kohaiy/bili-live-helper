@@ -4,6 +4,7 @@ import DataUtil from "./data.util";
 type MSG_TYPE_KEY =
   | "SELF_ENTER"
   | "POPULAR_TOTAL"
+  | "WATCHED_CHANGE"
   | "INTERACT_WORD"
   | "ENTER_ROOM"
   | "FOLLOW_ROOM"
@@ -18,6 +19,7 @@ type MSG_TYPE_KEY =
 export const MSG_TYPE = Object.freeze<Record<MSG_TYPE_KEY, MSG_TYPE_KEY>>({
   SELF_ENTER: "SELF_ENTER", // 自身加入直播间
   POPULAR_TOTAL: "POPULAR_TOTAL", // 人气
+  WATCHED_CHANGE: "WATCHED_CHANGE", // 看过人数
   INTERACT_WORD: "INTERACT_WORD", // 互动词
   ENTER_ROOM: "ENTER_ROOM", // 进入直播间
   FOLLOW_ROOM: "FOLLOW_ROOM", // 关注直播间
@@ -75,7 +77,14 @@ export class MsgBody {
     height: number;
     url: string;
   }>
+  /**
+   * 人气
+   */
   count = 0;
+  /**
+   * 看过人数
+   */
+  watched = 0;
   raw: unknown;
 
   static parse(body: unknown) {
@@ -88,6 +97,19 @@ export class MsgBody {
     const instance = new this(body);
     instance.count = count;
     instance.type = "POPULAR_TOTAL";
+    return instance;
+  }
+  static parseWatchedTotal(body: unknown) {
+    const { data: { num } } = body as {
+      data: {
+        num: number;
+        text_small: `${number}`;
+        text_large: `${number}人看过`;
+      }
+    };
+    const instance = new this(body);
+    instance.watched = num;
+    instance.type = "WATCHED_CHANGE";
     return instance;
   }
 
@@ -186,7 +208,7 @@ export class MsgBody {
         if (rawEmotesObj.emots) {
           instance.emotes = rawEmotesObj.emots;
         }
-       } catch (e) {
+      } catch (e) {
         console.error(e);
       }
     }
@@ -335,6 +357,9 @@ class Danmaku {
                   break;
                 case MSG_TYPE.COMBO_SEND:
                   this.handleEmit("COMBO_SEND", MsgBody.parseComboSend(body));
+                  break;
+                case MSG_TYPE.WATCHED_CHANGE:
+                  this.handleEmit("WATCHED_CHANGE", MsgBody.parseWatchedTotal(body));
                   break;
                 case MSG_TYPE.INTERACT_WORD:
                   this.handleInteractWord(body);

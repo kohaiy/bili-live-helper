@@ -9,48 +9,31 @@
             </template>
           </a-auto-complete>
         </a-form-item>
-        <a-form-item label="弹幕列表上限">
-          <a-input v-model="form.msgsLimit" />
-        </a-form-item>
-        <a-form-item label="自动清除入场提示">
-          <a-row align="center">
-            <a-col :span="12">
-              <a-switch v-model="form.autoClearEnter" />
-            </a-col>
-            <a-col :span="12" v-show="form.autoClearEnter">
-              <a-input v-model="form.clearEnterBefore">
-                <template #append>秒前</template>
-              </a-input>
-            </a-col>
-          </a-row>
-        </a-form-item>
-        <a-form-item label="合并相同礼物">
-          <a-row align="center">
-            <a-col :span="12">
-              <a-switch v-model="form.comboSameGift" />
-            </a-col>
-            <a-col :span="12" v-show="form.comboSameGift">
-              <a-input v-model="form.comboGiftIn">
-                <template #append>秒内</template>
-              </a-input>
-            </a-col>
-          </a-row>
-        </a-form-item>
-        <a-form-item label="语音播报">
-          <a-switch v-model="form.broadcast" />
-        </a-form-item>
       </a-form>
     </div>
   </setting-container>
 </template>
 
 <script lang="ts" setup>
-import { Config, config, saveConfig } from '@/utils/config';
+import { config, saveConfig } from '@/utils/config';
 import { FilterOption, Form, Message } from '@arco-design/web-vue';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import SettingContainer from './setting-container.vue';
 
-const form = ref({
+const form = ref<{
+  uid: string;
+  msgsLimit: string;
+  clearEnterBefore: string;
+  comboGiftIn: string;
+  autoClearEnter: boolean;
+  comboSameGift: boolean;
+  broadcast: boolean;
+  broadcaseVoiceOrigin: "SYS" | "TENCENT";
+  broadcaseVoiceTencentTTS: {
+    secretId: string;
+    secretKey: string;
+  };
+}>({
   uid: String(config.value.basic?.uid ?? ''),
   msgsLimit: String(config.value.basic?.msgsLimit ?? ''),
   clearEnterBefore: String(config.value.basic?.clearEnterBefore ?? ''),
@@ -58,8 +41,10 @@ const form = ref({
   autoClearEnter: config.value.basic?.autoClearEnter ?? false,
   comboSameGift: config.value.basic?.comboSameGift ?? false,
   broadcast: config.value.basic?.broadcast ?? false,
-}
-)
+  broadcaseVoiceOrigin: config.value.basic?.broadcaseVoiceOrigin ?? 'SYS',
+  broadcaseVoiceTencentTTS: config.value.basic?.broadcaseVoiceTencentTTS ?? { secretId: '', secretKey: '' },
+});
+
 const form$ = ref<InstanceType<typeof Form>>();
 
 const rules = {
@@ -70,17 +55,12 @@ const rules = {
 
 const handleSave = async () => {
   form$.value?.validate(async (errors) => {
-    console.log(errors);
     if (!errors) {
-      const { uid, msgsLimit, clearEnterBefore, comboGiftIn } = form.value;
+      const { uid } = form.value;
 
       config.value.basic = {
         ...config.value.basic,
-        ...form.value,
         uid: uid ? +uid : undefined,
-        msgsLimit: msgsLimit ? +msgsLimit : undefined,
-        clearEnterBefore: clearEnterBefore ? +clearEnterBefore : undefined,
-        comboGiftIn: comboGiftIn ? +comboGiftIn : undefined,
       };
       const res = await saveConfig();
       if (res) {

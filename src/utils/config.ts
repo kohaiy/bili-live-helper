@@ -13,6 +13,11 @@ export interface Config {
     comboSameGift?: boolean; // 是否合并相同礼物
     comboGiftIn?: number; // 合并多少秒内的礼物
     broadcast?: boolean; // 是否语音播报
+    broadcaseVoiceOrigin?: 'SYS' | 'TENCENT'; // 语音播报声音源
+    broadcaseVoiceTencentTTS?: {
+      secretId: string;
+      secretKey: string;
+    }; // 语音播报腾讯云 TTS 配置
   };
   music?: {
     enable?: boolean; // 是否开启点歌
@@ -36,6 +41,7 @@ export interface Config {
 }
 
 export const config = ref<Config>({});
+export const isLoaded = ref(false);
 
 ipcRenderer.on("configUpdated", (event, payload) => {
   config.value = payload as Config;
@@ -43,6 +49,7 @@ ipcRenderer.on("configUpdated", (event, payload) => {
 
 export const useConfig = async () => {
   config.value = (await IpcRendererUtil.send("initialize")) as Config;
+  isLoaded.value = true;
 };
 
 export const saveConfig = () => {

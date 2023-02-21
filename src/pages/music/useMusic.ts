@@ -1,6 +1,7 @@
 import NeteaseApi, { LyricItem, Song } from "@/apis/netease.api";
 import { config } from "@/utils/config";
 import { ref, computed, watch } from "vue";
+import { useStorage } from '@vueuse/core'
 
 // 随机播放 防止连续同一首
 const historySongIds: string[] = [];
@@ -8,7 +9,7 @@ const historySongIds: string[] = [];
 export const isPlaying = ref(true);
 export const currentSong = ref<Song | null>();
 export const currentLyric = ref<LyricItem[]>([]);
-export const songList = ref<Song[]>([]);
+export const songList = useStorage<Song[]>('SONG_LIST', []);
 export const nextSong = computed(() => songList.value[0]);
 export const cutSongUid = ref(new Set<number>());
 

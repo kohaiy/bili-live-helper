@@ -5,17 +5,12 @@
       <div class="btn" v-if="danmakuList.length" title="清屏" @click="handleClearDanmaku">
         <icon-loop />
       </div>
-      <div
-        class="btn on-top"
-        :class="{ 'is-active': isOnTop }"
-        title="置顶"
-        @click="handleOnTopChange"
-      >
+      <div class="btn on-top" :class="{ 'is-active': isOnTop }" title="置顶" @click="handleOnTopChange">
         <icon-pushpin />
       </div>
       <div class="btn lock" :class="{ 'is-active': isLocked }" title="锁定" @click="handleLockChange">
-        <icon-lock v-if="isLocked"/>
-        <icon-unlock v-else/>
+        <icon-lock v-if="isLocked" />
+        <icon-unlock v-else />
       </div>
       <div class="btn close" title="关闭" @click="handleClose">
         <icon-close-circle />
@@ -23,22 +18,18 @@
     </div>
     <!-- up 信息统计 -->
     <div class="up-stat-info">
-      <span class="stat-item">
-        <span class="label">人气：</span>
-        <span class="value">{{ popularTotal }}</span>
-      </span>
-      <span class="stat-item">
-        <span class="label">粉丝：</span>
-        <span class="value">{{ followerTotal }}</span>
+      <span class="stat-item" v-for="item in statList" :key="item.key">
+        <span class="label">{{ item.label }}</span>
+        <span class="value">{{ item.value }}</span>
       </span>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { getCurrentWindow } from '@electron/remote';
-import { popularTotal, followerTotal, danmakuList } from '../useDanmaku';
+import { popularTotal, followerTotal, danmakuList, watchedTotal } from '../useDanmaku';
 import BiliApi from '@/apis/bili.api';
 import { config } from '@/utils/config';
 
@@ -49,6 +40,23 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'update:isLocked', isLocked: boolean): void;
 }>();
+
+const statMap = {
+  popularTotal,
+  followerTotal,
+  watchedTotal,
+};
+
+// TODO: 放到 config 里面
+const temp: { key: (keyof typeof statMap), label: string }[] = [
+  { key: 'watchedTotal', label: '看过：' },
+  { key: 'popularTotal', label: '人气：' },
+  { key: 'followerTotal', label: '粉丝：' },
+];
+
+const statList = computed(() => {
+  return temp.map(({ key, label }) => ({ value: statMap[key], key, label }));
+})
 
 const isOnTop = ref(true);
 
@@ -80,6 +88,7 @@ const handleLockChange = () => {
 <style lang="scss" scoped>
 .danmaku-header {
   -webkit-app-region: drag;
+
   .operates {
     position: absolute;
     top: 10px;
@@ -101,7 +110,7 @@ const handleLockChange = () => {
         color: #5aacea;
       }
 
-      + .btn {
+      +.btn {
         margin-left: 10px;
       }
 
@@ -117,7 +126,7 @@ const handleLockChange = () => {
     user-select: none;
 
     .stat-item {
-      + .stat-item {
+      +.stat-item {
         margin-left: 10px;
       }
 

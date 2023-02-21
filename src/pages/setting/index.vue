@@ -1,5 +1,5 @@
 <template>
-  <div class="setting">
+  <div class="setting" v-if="isLoaded">
     <a-tabs position="left" type="capsule">
       <a-tab-pane key="1">
         <template #title>
@@ -8,6 +8,14 @@
           </span>
         </template>
         <basic-setting />
+      </a-tab-pane>
+      <a-tab-pane key="1-1">
+        <template #title>
+          <span>
+            <icon-align-left /> 弹幕
+          </span>
+        </template>
+        <danmaku-setting />
       </a-tab-pane>
       <a-tab-pane key="2">
         <template #title>
@@ -39,9 +47,11 @@
 
 <script lang="ts" setup>
 import BasicSetting from "./components/basic-setting.vue";
+import DanmakuSetting from './components/danmaku-setting.vue';
 import MusicSetting from "./components/music-setting.vue";
 import OtherSetting from "./components/other-setting.vue";
 import biliAccount from './components/bili-account.vue';
+import { isLoaded } from '@/utils/config';
 
 </script>
 

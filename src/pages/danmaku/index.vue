@@ -23,6 +23,8 @@ import {
   onDanmuMsg,
   popularTotal,
   danmakuList,
+  onWatchedChange,
+  watchedTotal,
 } from './useDanmaku';
 import DanmakuListVue from './components/danmaku-list.vue';
 import BiliGiftStyleUtil from '@/utils/bili-gift-style.util';
@@ -31,6 +33,9 @@ import { config } from '@/utils/config';
 import IpcRendererUtil from '@/utils/ipc-renderer.util';
 import { Message } from '@arco-design/web-vue';
 import BiliApi from '@/apis/bili.api';
+import { useVoice } from '@/uses/voice';
+
+const { addMessage } = useVoice();
 
 const danmakuInputVisible = ref(false);
 const danmakuContent = ref('');
@@ -60,7 +65,8 @@ const handleSendDanmaku = async (msg: string) => {
 };
 
 const handleInputKeyDown = (e: KeyboardEvent) => {
-  if (e.code === 'Enter') {
+  // 中文状态下输入后回车会触发 Enter，只能用 keyCode = 13 判断
+  if (e.keyCode === 13) {
     if (danmakuInputVisible.value && danmakuContent.value) {
       handleSendDanmaku(danmakuContent.value)
         .then(() => {
@@ -92,6 +98,10 @@ const isLocked = ref(false);
 
 onPopularTotal((body) => {
   popularTotal.value = body.count;
+});
+
+onWatchedChange((body) => {
+  watchedTotal.value = body.watched;
 });
 
 onAll((body) => {
@@ -142,7 +152,14 @@ onAll((body) => {
     // TODO watch 有点问题
     danmakuList.value = [...danmakuList.value];
   } else {
-    // console.log(body.type, body);
+    if (body.type === MSG_TYPE.OTHER) {
+      console.log(body.raw);
+    }
+  }
+  if (config.value.basic?.broadcast) {
+    if (body.type === MSG_TYPE.DANMU_MSG) {
+      addMessage({ text: body.msg, uid: body.uid });
+    }
   }
 });
 

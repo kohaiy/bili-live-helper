@@ -5,6 +5,8 @@ import BiliApi from "@/apis/bili.api";
 
 export const popularTotal = ref(0);
 
+export const watchedTotal = ref(0);
+
 export const followerTotal = ref(0);
 
 export const danmakuList = ref<MsgBody[]>([]);
@@ -57,6 +59,10 @@ export const onSelfEnter = (cb: MsgCallback) => {
 export const onPopularTotal = (cb: MsgCallback) => {
   danmaku.on("POPULAR_TOTAL", cb);
   return () => danmaku.off("POPULAR_TOTAL", cb);
+};
+export const onWatchedChange = (cb: MsgCallback) => {
+  danmaku.on("WATCHED_CHANGE", cb);
+  return () => danmaku.off("WATCHED_CHANGE", cb);
 };
 export const onEnterRoom = (cb: MsgCallback) => {
   danmaku.on("ENTER_ROOM", cb);
