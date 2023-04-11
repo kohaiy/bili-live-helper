@@ -8,12 +8,17 @@ export default class BiliApi {
       await fetch("https://api.bilibili.com/x/space/acc/info?mid=" + uid)
     ).json();
     if (res && res.code === 0) {
+      // TODO: 未开播时，会报错
+      console.log(res);
+      
       if (res.data.live_room.roomStatus)
         return {
           roomId: res.data.live_room.roomid as number,
           uname: res.data.name as string
         };
     }
+    console.error('getRoomInfo', res);
+    
     return null;
   }
   static async getUpInfo(uid: number) {

@@ -8,7 +8,6 @@ import App from './App.vue'
 import './samples/node-api'
 import IpcRendererUtil from './utils/ipc-renderer.util';
 import useConfig from './utils/config';
-import 'virtual:windi.css'
 
 IpcRendererUtil.initial();
 useConfig();

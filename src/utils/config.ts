@@ -18,6 +18,7 @@ export interface Config {
       secretId: string;
       secretKey: string;
     }; // 语音播报腾讯云 TTS 配置
+    headerStats?: { key: string; label: string; show: boolean }[], // 弹幕窗口头部状态显示
   };
   music?: {
     enable?: boolean; // 是否开启点歌

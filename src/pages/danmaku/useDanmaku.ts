@@ -2,6 +2,7 @@ import { ref, watch } from "vue";
 import Danmaku, { MsgBody, MsgCallback } from "@/utils/danmaku.util";
 import { config, saveConfig } from "@/utils/config";
 import BiliApi from "@/apis/bili.api";
+import { Message } from '@arco-design/web-vue';
 
 export const popularTotal = ref(0);
 
@@ -40,6 +41,8 @@ watch(
 
         danmakuList.value = [];
         danmaku.connect(roomId);
+      } else {
+        Message.error('获取房间信息失败');
       }
     }
   },
