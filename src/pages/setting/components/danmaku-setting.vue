@@ -62,6 +62,9 @@
             </div>
           </div>
         </a-form-item>
+        <a-form-item label="入场特别关注">
+          
+        </a-form-item>
         <a-form-item label="顶部显示">
           <div>
             <SortableTag v-model="form.headerStats" />
@@ -80,11 +83,10 @@
 
 <script lang="ts" setup>
 import { config, saveConfig, Config } from "@/utils/config";
-import { FilterOption, Form, Message, Link, Tag } from "@arco-design/web-vue";
-import { computed, ref, watch } from "vue";
+import { Form, Message } from "@arco-design/web-vue";
+import { ref } from "vue";
 import SettingContainer from "./setting-container.vue";
 import SortableTag from "./sortable-tag.vue";
-import { Ref } from "vue";
 
 const getDefaultHeaderStats = () => [
   { key: "watchedTotal", label: "看过：", show: true },

@@ -51,5 +51,8 @@
     "qrcode": "^1.5.1",
     "vue-router": "^4.1.6",
     "vuedraggable": "^4.1.0"
+  },
+  "prettier": {
+    "singleQuote": true
   }
 }

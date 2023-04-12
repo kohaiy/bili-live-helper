@@ -1,10 +1,17 @@
 import './initialize';
-import { app, BrowserWindow, globalShortcut } from 'electron'
-import { release } from 'node:os'
-import { trayGenerator } from '../tray-gen'
-import ConfigUtil from '../utils/config.util'
-import IpcMainUtil from '../utils/ipc-main.util'
-import { showDanmakuWin } from '../windows'
+import {
+  app,
+  BrowserWindow,
+  globalShortcut,
+  Menu,
+  ipcMain,
+  shell,
+} from 'electron';
+import { release } from 'node:os';
+import { trayGenerator } from '../tray-gen';
+import ConfigUtil from '../utils/config.util';
+import IpcMainUtil from '../utils/ipc-main.util';
+import { showDanmakuWin } from '../windows';
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -17,14 +24,14 @@ import { showDanmakuWin } from '../windows'
 //
 
 // Disable GPU Acceleration for Windows 7
-if (release().startsWith('6.1')) app.disableHardwareAcceleration()
+if (release().startsWith('6.1')) app.disableHardwareAcceleration();
 
 // Set application name for Windows 10+ notifications
-if (process.platform === 'win32') app.setAppUserModelId(app.getName())
+if (process.platform === 'win32') app.setAppUserModelId(app.getName());
 
 if (!app.requestSingleInstanceLock()) {
-  app.quit()
-  process.exit(0)
+  app.quit();
+  process.exit(0);
 }
 ConfigUtil.load();
 IpcMainUtil.initial();
@@ -73,20 +80,22 @@ IpcMainUtil.initial();
 //   })
 // }
 
-app.whenReady().then(() => {
-  globalShortcut.register('CommandOrControl+Enter', () => {
-    console.log('Electron loves global shortcuts!')
-    showDanmakuWin().webContents.send('SEND_DANMAKU');
+app
+  .whenReady()
+  .then(() => {
+    globalShortcut.register('CommandOrControl+Enter', () => {
+      console.log('Electron loves global shortcuts!');
+      showDanmakuWin().webContents.send('SEND_DANMAKU');
+    });
   })
-})
   .then(() => {
     showDanmakuWin();
     trayGenerator();
-  })
+  });
 
 app.on('window-all-closed', () => {
   // if (process.platform !== 'darwin') app.quit()
-})
+});
 
 // app.on('second-instance', () => {
 //   if (win) {
@@ -122,16 +131,42 @@ app.on('window-all-closed', () => {
 //   }
 // })
 
-IpcMainUtil.on("initialize", () => {
+IpcMainUtil.on('initialize', () => {
   return ConfigUtil.get();
 });
 /**
  *
  */
-IpcMainUtil.on("saveConfig", config => {
+IpcMainUtil.on('saveConfig', (config) => {
   ConfigUtil.save(config);
-  BrowserWindow.getAllWindows().forEach(window => {
-    window.webContents.send("configUpdated", config);
+  BrowserWindow.getAllWindows().forEach((window) => {
+    window.webContents.send('configUpdated', config);
   });
   return true;
+});
+
+IpcMainUtil.on(
+  'show-context-menu',
+  (payload: { menu: { key: string; label: string }[]; data: any }, event) => {
+    return new Promise((resolve) => {
+      const menu = Menu.buildFromTemplate(
+        payload.menu.map(({ key, label }) => ({
+          label,
+          click: () => {
+            resolve({ key, data: payload.data });
+          },
+        }))
+      );
+      menu.popup({ window: BrowserWindow.fromWebContents(event.sender) });
+      menu.on('menu-will-close', () => {
+        setTimeout(() => {
+          resolve(null);
+        });
+      });
+    });
+  }
+);
+
+IpcMainUtil.on('open-url', (url) => {
+  shell.openExternal(url);
 });

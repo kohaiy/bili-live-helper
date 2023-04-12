@@ -1,7 +1,7 @@
 import { ipcMain, BrowserWindow } from "electron";
 import DataUtil from "./data.util";
 
-type CALLBACK = (payload: any) => Promise<any> | any;
+type CALLBACK = (payload: any, event: Electron.IpcMainEvent) => Promise<any> | any;
 
 if (DataUtil.isBrowser()) {
   throw new Error(`[ipc-main.util.ts] 不能在渲染线程引用， ${__filename}`);
@@ -22,7 +22,7 @@ class IpcMainUtil {
       };
       const cb = events.get(type);
       if (cb) {
-        const res = await cb(payload);
+        const res = await cb(payload, event);
         event.sender.send(CHANNEL, {
           id,
           payload: res

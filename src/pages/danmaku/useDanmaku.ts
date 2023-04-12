@@ -19,31 +19,35 @@ watch(
     console.log({newVal, oldVal});
     
     if (newVal && oldVal !== newVal) {
+      let {roomId, uname } = config.value;
       const res = await BiliApi.getRoomInfo(newVal);
       if (res) {
-        const { roomId, uname } = res;
-        config.value.roomId = roomId;
-        config.value.uname = uname;
-        const uidList = config.value.history?.uidList ?? [];
-        let uid = uidList.find(({ id }) => id === newVal);
-        if (uid) {
-          uid.name = uname;
-        } else {
-          uid = {
-            id: newVal,
-            name: uname,
-          };
-          uidList.push(uid);
-        }
-        config.value.history = config.value.history ?? {};
-        config.value.history.uidList = uidList;
-        saveConfig();
-
-        danmakuList.value = [];
-        danmaku.connect(roomId);
+        ({ roomId, uname } = res);
       } else {
         Message.error('获取房间信息失败');
       }
+      config.value.roomId = roomId;
+      config.value.uname = uname;
+    
+      const uidList = config.value.history?.uidList ?? [];
+      let uid = uidList.find(({ id }) => id === newVal);
+      if (uid) {
+        uid.name = uname;
+      } else {
+        uid = {
+          id: newVal,
+          name: uname,
+        };
+        uidList.push(uid);
+      }
+      config.value.history = config.value.history ?? {};
+      config.value.history.uidList = uidList;
+      saveConfig();
+
+      danmakuList.value = [];
+      if (roomId)
+        danmaku.connect(roomId);
+     
     }
   },
   { immediate: true, }
