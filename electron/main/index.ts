@@ -11,7 +11,7 @@ import { release } from 'node:os';
 import { trayGenerator } from '../tray-gen';
 import ConfigUtil from '../utils/config.util';
 import IpcMainUtil from '../utils/ipc-main.util';
-import { showDanmakuWin } from '../windows';
+import { showCustomWin, showDanmakuWin, showNotifyWin } from '../windows';
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -90,6 +90,7 @@ app
   })
   .then(() => {
     showDanmakuWin();
+    showNotifyWin();
     trayGenerator();
   });
 
@@ -169,4 +170,12 @@ IpcMainUtil.on(
 
 IpcMainUtil.on('open-url', (url) => {
   shell.openExternal(url);
+});
+
+IpcMainUtil.on('open-window', (payload) => {
+  showCustomWin(payload.url, payload.options);
+});
+
+IpcMainUtil.on('notify', (payload) => {
+  showNotifyWin().webContents.send('notify', payload);
 });

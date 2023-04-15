@@ -1,7 +1,8 @@
-import NeteaseApi, { LyricItem, Song } from "@/apis/netease.api";
-import { config } from "@/utils/config";
-import { ref, computed, watch } from "vue";
-import { useStorage } from '@vueuse/core'
+import NeteaseApi, { LyricItem, Song } from '@/apis/netease.api';
+import { config } from '@/utils/config';
+import { ref, computed, watch, h } from 'vue';
+import { useStorage } from '@vueuse/core';
+import { sendNotify } from '@/utils/notify.util';
 
 // 随机播放 防止连续同一首
 const historySongIds: string[] = [];
@@ -29,7 +30,7 @@ export const handleAddSong = async (keyword: string) => {
   if (rawSong) {
     const song = await NeteaseApi.getSongDetail(rawSong.id);
     console.log(song);
-    
+
     if (song) {
       if (songFilter(song)) {
         // 当前歌曲不为空，则添加进歌单，为空则直接播放
@@ -38,6 +39,15 @@ export const handleAddSong = async (keyword: string) => {
         } else {
           currentSong.value = song;
         }
+        sendNotify({
+          type: 'success',
+          title: '点歌成功',
+          content: [
+            `点歌：${song.name}`,
+            `歌单列表：${songList.value.length} 首`,
+          ].join('\n'),
+          duration: 5000,
+        });
       }
     }
   }

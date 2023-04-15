@@ -24,6 +24,14 @@ const routes: RouteRecordRaw[] = [
             title: "控制面板"
         },
         component: () => import("@/pages/setting/index.vue")
+    },
+    {
+        path: "/notify",
+        name: "Notify",
+        meta: {
+            title: "通知中心"
+        },
+        component: () => import("@/pages/notify/index.vue")
     }
 ];
 

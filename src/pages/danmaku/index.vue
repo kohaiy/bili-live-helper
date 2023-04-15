@@ -8,6 +8,7 @@
     <div class="danmaku-send" :class="{ 'visible': danmakuInputVisible }">
       <input type="text" v-model="danmakuContent" @keydown="handleInputKeyDown" ref="danmakuInputEl"
         placeholder="Enter 显示/提交， ESC 关闭">
+      <icon-loading class="submitting-icon" v-show="isSubmitting" />
     </div>
   </div>
 </template>
@@ -39,6 +40,7 @@ const { addMessage } = useVoice();
 
 const danmakuInputVisible = ref(false);
 const danmakuContent = ref('');
+const isSubmitting = ref(false);
 const danmakuInputEl = ref<HTMLInputElement>();
 ipcRenderer.on('SEND_DANMAKU', () => {
   showDanmakuInput();
@@ -67,11 +69,15 @@ const handleSendDanmaku = async (msg: string) => {
 const handleInputKeyDown = (e: KeyboardEvent) => {
   // 中文状态下输入后回车会触发 Enter，只能用 keyCode = 13 判断
   if (e.keyCode === 13) {
-    if (danmakuInputVisible.value && danmakuContent.value) {
+    if (danmakuInputVisible.value && danmakuContent.value && !isSubmitting.value) {
+      isSubmitting.value = true;
       handleSendDanmaku(danmakuContent.value)
         .then(() => {
           danmakuContent.value = '';
           danmakuInputVisible.value = false;
+        })
+        .finally(() => {
+          isSubmitting.value = false;
         });
     }
   }
@@ -249,6 +255,15 @@ const handleMouseLeave = () => {
       color: #fff;
       font-size: 14px;
       background-color: rgba(255, 255, 255, 0)
+    }
+
+    .submitting-icon {
+      position: absolute;
+      top: 50%;
+      right: 4px;
+      margin-top: -9px;
+      font-size: 18px;
+      pointer-events: none;
     }
   }
 

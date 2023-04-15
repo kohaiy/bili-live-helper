@@ -13,6 +13,7 @@ import DmkInteractWord from './types/dmk-interact-word.vue';
 import DmkDanmuMsg from './types/dmk-danmu-msg.vue';
 import DmkSendGift from './types/dmk-send-gift.vue';
 import IpcRendererUtil from '@/utils/ipc-renderer.util';
+import { sendNotify } from '@/utils/notify.util';
 
 const props = defineProps<{
   data: MsgBody;
@@ -48,6 +49,11 @@ const handleRightClick = async () => {
         console.log('------DEBUG-------');
         console.log({ ...props.data });
         console.log('------DEBUG-------');
+        sendNotify({
+          content: `## 测试通知
+- 测试通知
+- 测试通知`,
+        })
       }
     },
   ];
