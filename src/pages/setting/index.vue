@@ -1,7 +1,7 @@
 <template>
   <div class="setting" v-if="isLoaded">
-    <a-tabs position="left" type="capsule">
-      <a-tab-pane key="1">
+    <a-tabs position="left" type="capsule" destroy-on-hide>
+      <a-tab-pane key="basic">
         <template #title>
           <span>
             <icon-settings /> 基础
@@ -9,7 +9,7 @@
         </template>
         <basic-setting />
       </a-tab-pane>
-      <a-tab-pane key="1-1">
+      <a-tab-pane key="danmaku">
         <template #title>
           <span>
             <icon-align-left /> 弹幕
@@ -17,7 +17,7 @@
         </template>
         <danmaku-setting />
       </a-tab-pane>
-      <a-tab-pane key="2">
+      <a-tab-pane key="music">
         <template #title>
           <span>
             <icon-music /> 点歌
@@ -33,7 +33,15 @@
         </template>
         <bili-account />
       </a-tab-pane>
-      <a-tab-pane key="3">
+      <a-tab-pane key="auto-reply">
+        <template #title>
+          <span>
+            <icon-message /> 回复
+          </span>
+        </template>
+        <auto-reply-setting />
+      </a-tab-pane>
+      <a-tab-pane key="others">
         <template #title>
           <span>
             <icon-apps /> 其他
@@ -46,12 +54,13 @@
 </template>
 
 <script lang="ts" setup>
-import BasicSetting from "./components/basic-setting.vue";
-import DanmakuSetting from './components/danmaku-setting.vue';
-import MusicSetting from "./components/music-setting.vue";
-import OtherSetting from "./components/other-setting.vue";
-import biliAccount from './components/bili-account.vue';
+import BasicSetting from "./pages/basic-setting.vue";
+import DanmakuSetting from './pages/danmaku-setting.vue';
+import MusicSetting from "./pages/music-setting.vue";
+import OtherSetting from "./pages/other-setting.vue";
+import biliAccount from './pages/bili-account.vue';
 import { isLoaded } from '@/utils/config';
+import AutoReplySetting from './pages/auto-reply-setting.vue';
 
 </script>
 

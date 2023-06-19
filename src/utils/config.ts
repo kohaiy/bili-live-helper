@@ -1,6 +1,13 @@
-import { ipcRenderer } from "electron";
-import { ref } from "vue";
-import IpcRendererUtil from "./ipc-renderer.util";
+import { ipcRenderer } from 'electron';
+import { ref } from 'vue';
+import IpcRendererUtil from './ipc-renderer.util';
+
+export interface AutoReply {
+  keyword: string;
+  replyContent: string;
+  isRegExp?: boolean;
+  order?: number;
+}
 
 export interface Config {
   uname?: string;
@@ -18,7 +25,7 @@ export interface Config {
       secretId: string;
       secretKey: string;
     }; // 语音播报腾讯云 TTS 配置
-    headerStats?: { key: string; label: string; show: boolean }[], // 弹幕窗口头部状态显示
+    headerStats?: { key: string; label: string; show: boolean }[]; // 弹幕窗口头部状态显示
   };
   music?: {
     enable?: boolean; // 是否开启点歌
@@ -30,7 +37,7 @@ export interface Config {
   // 历史记录
   history?: {
     uidList?: { id: number; name?: string }[];
-  },
+  };
   cookie?: {
     SESSDATA: string;
     bili_jct: string;
@@ -38,23 +45,25 @@ export interface Config {
     DedeUserID__ckMd5: string;
     sid: string;
     text: string;
-  },
+  };
+  enableAutoReply?: boolean;
+  autoReplies?: AutoReply[];
 }
 
 export const config = ref<Config>({});
 export const isLoaded = ref(false);
 
-ipcRenderer.on("configUpdated", (event, payload) => {
+ipcRenderer.on('configUpdated', (event, payload) => {
   config.value = payload as Config;
 });
 
 export const useConfig = async () => {
-  config.value = (await IpcRendererUtil.send("initialize")) as Config;
+  config.value = (await IpcRendererUtil.send('initialize')) as Config;
   isLoaded.value = true;
 };
 
 export const saveConfig = () => {
-  return IpcRendererUtil.send("saveConfig", config.value);
+  return IpcRendererUtil.send('saveConfig', config.value);
 };
 
 export default useConfig;

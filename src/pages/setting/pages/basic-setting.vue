@@ -18,7 +18,7 @@
 import { config, saveConfig } from '@/utils/config';
 import { FilterOption, Form, Message } from '@arco-design/web-vue';
 import { computed, ref, watch } from 'vue';
-import SettingContainer from './setting-container.vue';
+import SettingContainer from '../components/setting-container.vue';
 
 const form = ref<{
   uid: string;

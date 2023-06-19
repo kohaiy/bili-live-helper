@@ -30,11 +30,13 @@ import {
 import DanmakuListVue from './components/danmaku-list.vue';
 import BiliGiftStyleUtil from '@/utils/bili-gift-style.util';
 import { MSG_TYPE } from '@/utils/danmaku.util';
-import { config } from '@/utils/config';
+import { config, saveConfig } from '@/utils/config';
 import IpcRendererUtil from '@/utils/ipc-renderer.util';
 import { Message } from '@arco-design/web-vue';
 import BiliApi from '@/apis/bili.api';
 import { useVoice } from '@/uses/voice';
+import { sendNotify } from '@/utils/notify.util';
+import DataUtil from '@/utils/data.util';
 
 const { addMessage } = useVoice();
 
@@ -165,6 +167,28 @@ onAll((body) => {
   if (config.value.basic?.broadcast) {
     if (body.type === MSG_TYPE.DANMU_MSG) {
       addMessage({ text: body.msg, uid: body.uid });
+    }
+  }
+  // 自动回复
+  if (config.value.enableAutoReply && body.type === MSG_TYPE.DANMU_MSG && config.value.autoReplies?.length) {
+    const autoReplies = config.value.autoReplies;
+    const index = autoReplies.findIndex(({ keyword, replyContent }) => {
+      if (DataUtil.isTextMatch(keyword, body.msg)) {
+        sendNotify({
+          title: `自动回复 ${body.uname}：${body.msg}`,
+          content: replyContent,
+          duration: 10000,
+        });
+        if (config.value.basic?.broadcast) {
+          addMessage({ text: `自动回复 ${body.uname}：${body.msg}，${replyContent}`, uid: body.uid });
+        }
+        return true;
+      }
+    });
+    if (index >= 0) {
+      autoReplies[index].order = (autoReplies[index].order ?? 0) + 1;
+      autoReplies.sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
+      saveConfig();
     }
   }
 });

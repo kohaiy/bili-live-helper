@@ -5,5 +5,5 @@
 </template>
 
 <script lang="ts" setup>
-import SettingContainer from './setting-container.vue';
+import SettingContainer from '../components/setting-container.vue';
 </script>

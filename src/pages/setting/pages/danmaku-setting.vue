@@ -85,8 +85,8 @@
 import { config, saveConfig, Config } from "@/utils/config";
 import { Form, Message } from "@arco-design/web-vue";
 import { ref } from "vue";
-import SettingContainer from "./setting-container.vue";
-import SortableTag from "./sortable-tag.vue";
+import SettingContainer from "../components/setting-container.vue";
+import SortableTag from "../components/sortable-tag.vue";
 
 const getDefaultHeaderStats = () => [
   { key: "watchedTotal", label: "看过：", show: true },

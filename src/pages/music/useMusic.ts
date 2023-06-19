@@ -26,9 +26,9 @@ watch(
 );
 
 export const handleAddSong = async (keyword: string) => {
-  const rawSong = await NeteaseApi.search(keyword);
-  if (rawSong) {
-    const song = await NeteaseApi.getSongDetail(rawSong.id);
+  const rawSongs = await NeteaseApi.search(keyword);
+  if (rawSongs.length) {
+    const song = await NeteaseApi.getSongDetail(rawSongs[0].id);
     console.log(song);
 
     if (song) {

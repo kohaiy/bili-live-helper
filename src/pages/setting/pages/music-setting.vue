@@ -26,7 +26,7 @@
 import { config, saveConfig } from '@/utils/config';
 import { Form as AForm, Message } from '@arco-design/web-vue';
 import { ref } from 'vue';
-import SettingContainer from './setting-container.vue';
+import SettingContainer from '../components/setting-container.vue';
 import KTags from '@/components/k-tags/index.vue';
 import NeteaseApi from '@/apis/netease.api';
 

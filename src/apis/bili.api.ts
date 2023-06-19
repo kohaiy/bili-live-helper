@@ -5,9 +5,9 @@ import NodeFetch, { FormData as NodeFormData } from 'node-fetch';
 export default class BiliApi {
   static async getRoomInfo(uid: number) {
     const res = await (
-      await fetch("https://api.bilibili.com/x/space/acc/info?mid=" + uid)
+      await fetch("https://api.bilibili.com/x/space/wbi/acc/info?mid=" + uid)
     ).json();
-    if (res && res.code === 0) {
+    if (res?.code === 0) {
       // TODO: 未开播时，会报错
       console.log(res);
       
@@ -18,8 +18,14 @@ export default class BiliApi {
         };
     }
     console.error('getRoomInfo', res);
+    if (res?.code === -403) {
+      throw new Error('请先到控制面板登录');
+    }
+    if (res?.message) {
+      throw new Error(res.message);
+    }
     
-    return null;
+    throw new Error('获取房间信息失败');
   }
   static async getUpInfo(uid: number) {
     const res = await (

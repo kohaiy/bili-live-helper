@@ -7,6 +7,30 @@ export default class DataUtil {
     return Boolean(typeof window !== 'undefined');
   }
 
+  static parseRegExpRule(rule: string) {
+    if (/^\/(.+)\/([ig]{0,})$/g.test(rule)) {
+      const [, pattern, flags] = /^\/(.+)\/([ig]{0,})$/g.exec(rule) ?? [];
+      if (pattern) {
+        try {
+          return new RegExp(pattern, flags);
+        } catch (e) {}
+      }
+    }
+  }
+
+  /**
+   * 判断文本是否匹配
+   * @param rule 规则
+   * @param text 代匹配文本
+   */
+  static isTextMatch(rule: string, text: string) {
+    const reg = this.parseRegExpRule(rule);
+    if (reg) {
+      return reg.test(text);
+    }
+    return rule === text;
+  }
+
   /**
    * 数据脱敏
    * @param data 原始数据

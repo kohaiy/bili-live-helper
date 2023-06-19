@@ -66,10 +66,10 @@ class NeteaseApi {
         // const id = result.songs[0].id;
         // const res = await song_url({ id });
         // console.log(res.body.data);
-        return result.songs[0];
+        return result.songs as any[];
       }
     }
-    return null;
+    return [];
   }
 
   static async getHotList(id: number | string = "3778678") {

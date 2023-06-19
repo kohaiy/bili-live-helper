@@ -35,7 +35,7 @@
 <script lang="ts" setup>
 import qrcode from 'qrcode';
 import BiliApi from '@/apis/bili.api';
-import SettingContainer from './setting-container.vue';
+import SettingContainer from '../components/setting-container.vue';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { config, saveConfig } from '@/utils/config';
 import { Message } from '@arco-design/web-vue';
@@ -103,8 +103,14 @@ const handleSendTestDanmaku = async () => {
 const userInfo = ref<Awaited<ReturnType<typeof BiliApi.getUserInfo>>['data']>();
 const getUserInfo = async () => {
   const res = await BiliApi.getUserInfo(config.value.cookie!);
+  console.log(res);
+  
   if (res.code === 0) {
     userInfo.value = res.data;
+  } else if (res.code === -403) {
+    Message.error('登录已过期');
+    config.value.cookie = undefined;
+    saveConfig();
   }
   return res;
 }
