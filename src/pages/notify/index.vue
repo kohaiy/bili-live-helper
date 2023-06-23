@@ -6,6 +6,7 @@
 import { ipcRenderer } from "electron";
 import { Notification } from '@arco-design/web-vue';
 import { h } from 'vue';
+import { marked } from 'marked';
 
 ipcRenderer.on('notify', (event, payload) => {
     const type: 'info' | 'error' | 'warning' | 'success' = payload.type || 'info';
@@ -14,8 +15,11 @@ ipcRenderer.on('notify', (event, payload) => {
     Notification[type]?.({
         ...payload,
         position: "topLeft",
-        content: () => h('div', {},
-            payload.content.split('\n').map((msg: string) => h('p', {}, msg))),
+        content: () => payload.markdown ?
+            h('div', {
+                innerHTML: marked(payload.content),
+            }) :
+            h('div', {}, payload.content.split('\n').map((msg: string) => h('p', {}, msg))),
         duration,
     })
 });

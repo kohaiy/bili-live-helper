@@ -26,8 +26,8 @@ class IpcRendererUtil {
     });
   }
 
-  static send(type: string, payload?: any) {
-    return new Promise(resolve => {
+  static send<T>(type: string, payload?: any) {
+    return new Promise<T>(resolve => {
       const id = DataUtil.generateId();
       events.set(id, resolve);
       payload = payload && JSON.parse(JSON.stringify(payload));

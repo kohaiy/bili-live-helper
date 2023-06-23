@@ -27,6 +27,8 @@
     "@arco-design/web-vue": "^2.42.0",
     "@electron/remote": "^2.0.9",
     "@types/axios": "^0.14.0",
+    "@types/marked": "^5.0.0",
+    "@types/md5": "^2.3.2",
     "@types/pako": "^2.0.0",
     "@types/qrcode": "^1.5.0",
     "@vitejs/plugin-vue": "^4.0.0",
@@ -46,13 +48,17 @@
     "@vueuse/core": "^9.12.0",
     "NeteaseCloudMusicApi": "^4.8.9",
     "axios": "^1.2.6",
+    "marked": "^5.1.0",
+    "md5": "^2.3.0",
     "node-fetch": "^3.3.0",
     "pako": "^2.1.0",
     "qrcode": "^1.5.1",
+    "tencentcloud-sdk-nodejs": "^4.0.627",
     "vue-router": "^4.1.6",
     "vuedraggable": "^4.1.0"
   },
   "prettier": {
-    "singleQuote": true
+    "singleQuote": true,
+    "tabWidth": 4
   }
 }

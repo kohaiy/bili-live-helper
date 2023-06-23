@@ -43,7 +43,7 @@ export const handleAddSong = async (keyword: string) => {
           type: 'success',
           title: '点歌成功',
           content: [
-            `点歌：${song.name}`,
+            `歌名：${song.name} - ${song.artistsString}`,
             `歌单列表：${songList.value.length} 首`,
           ].join('\n'),
           duration: 5000,
@@ -53,9 +53,9 @@ export const handleAddSong = async (keyword: string) => {
   }
 };
 
-export const handleNextSong = async () => {
+export const handleNextSong = async (song?: Song) => {
   cutSongUid.value.clear();
-  currentSong.value = songList.value.shift();
+  currentSong.value = song || songList.value.shift();
   if (!currentSong.value) {
     currentSong.value = await getRandomSong();
   }

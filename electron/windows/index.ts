@@ -90,7 +90,7 @@ export const showNotifyWin = () => {
       notifyWin = null;
     });
   }
-  notifyWin.show();
+  // notifyWin.show();
 
   return notifyWin;
 };

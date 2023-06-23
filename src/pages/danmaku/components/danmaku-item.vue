@@ -1,6 +1,6 @@
 <template>
   <label class="danmaku-item" :class="{ 'is-operating': isOperating }" @contextmenu="handleRightClick">
-    <component :is="danmakuType" :data="data" />
+    <component :is="danmakuType" :data="data" v-if="danmakuType" />
     <input type="checkbox" />
     <div class="time">{{ mapTime(data.time) }}</div>
   </label>

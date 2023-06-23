@@ -1,5 +1,4 @@
 // Depends on tencentcloud-sdk-nodejs version 4.0.3 or higher
-// @ts-ignore
 import tencentcloud from "tencentcloud-sdk-nodejs";
 
 const TtsClient = tencentcloud.tts.v20190823.Client;
@@ -25,15 +24,15 @@ export function textToVoice(params: any) {
     params.SessionId = params.SessionId || 'SessionId';
     const { secretId, secretKey, ...others } = params;
     if (!secretId || !secretKey) return null;
-    return new Promise(async resolve => {
+    return new Promise(async (resolve) => {
         try {
-            const t = setTimeout(() => resolve(null), 5000);
+            const t = setTimeout(() => resolve([new Error('请求超时')]), 5000);
             const data = await getClient(secretId, secretKey).TextToVoice(others);
             clearTimeout(t);
-            resolve(data && data.Audio);
+            resolve([null, data && data.Audio]);
         } catch (e) {
             console.log(e);
-            resolve(null);
+            resolve([e]);
         }
     });
 };

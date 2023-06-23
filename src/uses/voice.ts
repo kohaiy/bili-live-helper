@@ -1,10 +1,11 @@
 import { config } from '@/utils/config';
-import { playBySys, playByTencentTTS } from '@/utils/tts.util';
+import { sendNotify } from '@/utils/notify.util';
+import { playBySys, playByTencentTTS, resetVoiceType } from '@/utils/tts.util';
 
 type VoiceInfo = {
     text: string;
     uid: number;
-}
+};
 
 // 消息队列
 const messages: VoiceInfo[] = [];
@@ -15,7 +16,7 @@ const addMessage = (info: VoiceInfo) => {
     if (!isPlaying) {
         playNextVoice();
     }
-}
+};
 
 const playNextVoice = async () => {
     const info = messages.shift();
@@ -23,11 +24,19 @@ const playNextVoice = async () => {
     if (!info) {
         return;
     }
-    const broadcaseVoiceOrigin = config.value.basic?.broadcaseVoiceOrigin ?? 'SYS';
-    if (broadcaseVoiceOrigin === 'SYS') {
-        playBySys(info);
-    } else if (broadcaseVoiceOrigin === 'TENCENT') {
-        await playByTencentTTS(info);
+    const broadcaseVoiceOrigin =
+        config.value.basic?.broadcaseVoiceOrigin ?? 'SYS';
+    try {
+        if (broadcaseVoiceOrigin === 'SYS') {
+            playBySys(info);
+        } else if (broadcaseVoiceOrigin === 'TENCENT') {
+            await playByTencentTTS(info);
+        }
+    } catch (e: any) {
+        sendNotify({
+            type: 'error',
+            content: e?.message,
+        });
     }
     playNextVoice();
 };
@@ -35,5 +44,6 @@ const playNextVoice = async () => {
 export const useVoice = () => {
     return {
         addMessage,
-    }
+        resetVoiceType,
+    };
 };

@@ -15,7 +15,7 @@
       <!-- 歌曲信息 -->
       <div class="music-info">
         <div class="music-heading">
-          <div class="music-next" @click="handleNextSong">
+          <div class="music-next" @click="handleNextSong()">
             <icon-skip-next-fill />
           </div>
           <div class="music-name" :title="currentSong?.name">
@@ -79,6 +79,7 @@ import MusicLyric from "./components/music-lyric.vue";
 import MusicDynamic from "./components/music-dynamic.vue";
 import KWalkingText from "@/components/k-walking-text/index.vue";
 import { sendNotify } from '@/utils/notify.util';
+import { useStorage } from '@vueuse/core';
 
 const playInfo = ref({
   duration: 0,
@@ -102,18 +103,21 @@ audio.addEventListener("pause", () => {
 });
 audio.addEventListener("timeupdate", () => {
   playInfo.value.currentTime = audio.currentTime;
+  currentPlay.value.currentTime = audio.currentTime;
 });
 audio.addEventListener("ended", () => {
   playInfo.value.currentTime = 0;
   playInfo.value.duration = 0;
+  currentPlay.value.song = void 0;
+  currentPlay.value.currentTime = 0;
   handleNextSong();
 });
 
 IpcRendererUtil.on("DANMU_MSG", async (body: MsgBody) => {
   if (body.type === "DANMU_MSG") {
-    if (/^点歌/.test(body.msg)) {
+    if (/^(点歌|dg)/i.test(body.msg)) {
       if (config.value.music?.enable) {
-        await handleAddSong(body.msg.replace(/^点歌/, ""));
+        await handleAddSong(body.msg.replace(/^(点歌|dg)/i, ""));
       } else {
         sendNotify({
           type: 'error',
@@ -126,10 +130,11 @@ IpcRendererUtil.on("DANMU_MSG", async (body: MsgBody) => {
     } else if (/^(播放列表|歌单)/.test(body.msg)) {
       sendNotify({
         title: '当前播放列表',
+        markdown: true,
         content: [
-          currentSong.value ? `* ${currentSong.value.name} - ${currentSong.value.artistsString}（正在播放）` : null,
-          ...songList.value.map(s => `* ${s.name} - ${s.artistsString}`)
-        ].filter(Boolean).join('\n'),
+          currentSong.value ? `${currentSong.value.name} - ${currentSong.value.artistsString}（正在播放）` : null,
+          ...songList.value.map(s => `${s.name} - ${s.artistsString}`)
+        ].filter(Boolean).map((it, i) => `${i + 1}. ${it}`).join('\n'),
         duration: 7000
       })
     }
@@ -141,6 +146,7 @@ watch(
   () => {
     console.log("currentSong change");
     if (currentSong.value) {
+      currentPlay.value.song = currentSong.value;
       handlePlayNewSong(currentSong.value);
     } else {
       audio.pause();
@@ -149,7 +155,8 @@ watch(
 );
 
 // handleAddSong("好日子");
-handleNextSong();
+const currentPlay = useStorage<{ currentTime?: number; song?: Song }>('CURRENT_PLAY', {});
+handleNextSong(currentPlay.value.song);
 
 const handlePlayNewSong = async (song: Song) => {
   try {
@@ -157,6 +164,7 @@ const handlePlayNewSong = async (song: Song) => {
     audio.src = `https://music.163.com/song/media/outer/url?id=${song.id}.mp3`;
     // 开始播放
     await audio.play();
+    audio.currentTime = currentPlay.value.currentTime ?? 0;
     // 保存歌曲时长
     playInfo.value.duration = audio.duration;
     sendNotify({

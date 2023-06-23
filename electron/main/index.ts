@@ -12,6 +12,7 @@ import { trayGenerator } from '../tray-gen';
 import ConfigUtil from '../utils/config.util';
 import IpcMainUtil from '../utils/ipc-main.util';
 import { showCustomWin, showDanmakuWin, showNotifyWin } from '../windows';
+import { textToVoice } from '../utils/tencent-cloud';
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -179,3 +180,17 @@ IpcMainUtil.on('open-window', (payload) => {
 IpcMainUtil.on('notify', (payload) => {
   showNotifyWin().webContents.send('notify', payload);
 });
+
+IpcMainUtil.on('TTS', ({
+  Text,
+  VoiceType,
+  secretId,
+  secretKey,
+}) => {
+  return textToVoice({
+    Text,
+    VoiceType,
+    secretId,
+    secretKey,
+  });
+})
