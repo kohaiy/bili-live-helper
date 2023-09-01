@@ -48,7 +48,7 @@
     "@vueuse/core": "^9.12.0",
     "NeteaseCloudMusicApi": "^4.8.9",
     "axios": "^1.2.6",
-    "marked": "^5.1.0",
+    "marked": "^7.0.5",
     "md5": "^2.3.0",
     "node-fetch": "^3.3.0",
     "pako": "^2.1.0",
